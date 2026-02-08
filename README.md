@@ -1,5 +1,5 @@
 # Simple URP Auto Exposure
-If you use or modify this package, credit is appreciated.
+Feel free to use or modify this package!
 
 ## Requirements
 - Unity 2022.3+
@@ -15,4 +15,5 @@ https://github.com/miyulake/AutoExposureURP.git
 - Change settings to suit your scene
 
 ![Auto Exposure Example](https://github.com/user-attachments/assets/0a3d8c9d-d3af-4ef8-9dd7-d20bfa738d10)
+
 
