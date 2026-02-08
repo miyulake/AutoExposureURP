@@ -14,4 +14,5 @@ https://github.com/miyulake/AutoExposureURP.git
 - Select Auto Exposure
 - Change settings to suit your scene
 
-![Auto Exposure Example](https://github.com/user-attachments/assets/5119e0cc-6b88-4b13-9e9b-276aaa82e279)
+![Auto Exposure Example](https://github.com/user-attachments/assets/0a3d8c9d-d3af-4ef8-9dd7-d20bfa738d10)
+
