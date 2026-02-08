@@ -1,0 +1,9 @@
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Documentation files
+*.pdf
+*.pdf.meta
+*.docx
+*.docx.meta
