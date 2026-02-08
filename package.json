@@ -1,9 +1,9 @@
 {
     "name": "com.miyulake.auto-exposure-urp",
-    "version": "1.0.0",
     "displayName": "Auto Exposure",
-    "description": "Simple auto exposure render feature for Unity URP.",
+    "version": "1.0.0",
     "unity": "2022.3",
+    "description": "Simple auto exposure render feature for Unity URP.",
     "author": {
         "name": "M I Y U",
         "url": "https://miyu.gay"
@@ -11,5 +11,5 @@
     "dependencies": {
         "com.unity.render-pipelines.universal": "14.0.12"
     },
-    "licensesUrl": "https://github.com/miyulake/auto-exposure-urp/blob/main/LICENSE"
+    "hideInEditor": false
 }
