@@ -1,8 +1,8 @@
 {
-    "name": "com.miyulake.autoexposure",
+    "name": "com.miyulake.auto-exposure-urp",
     "version": "1.0.0",
     "displayName": "Auto Exposure",
-    "description": "Simple auto exposure render feature for Unity.",
+    "description": "Simple auto exposure render feature for Unity URP.",
     "unity": "2022.3",
     "author": {
         "name": "M I Y U",
