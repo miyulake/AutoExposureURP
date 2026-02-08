@@ -13,3 +13,5 @@ https://github.com/miyulake/AutoExposureURP.git
 - Add Renderer Feature to Universal Renderer Data
 - Select Auto Exposure
 - Change settings to suit your scene
+
+![Auto Exposure Example](https://github.com/user-attachments/assets/5119e0cc-6b88-4b13-9e9b-276aaa82e279)
