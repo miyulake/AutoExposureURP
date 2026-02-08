@@ -2,9 +2,13 @@
   "name": "AutoExposure.Editor",
   "references": [
     "AutoExposure.Runtime",
-    "Unity.RenderPipelines.Core.Runtime",
     "Unity.RenderPipelines.Universal.Runtime"
   ],
   "includePlatforms": ["Editor"],
-  "autoReferenced": true
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": []
 }

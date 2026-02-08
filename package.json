@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "displayName": "Auto Exposure",
     "description": "Simple auto exposure render feature for Unity.",
-    "unity": "2022.3.62f3",
+    "unity": "2022.3",
     "author": {
         "name": "M I Y U",
         "url": "https://miyu.gay"
