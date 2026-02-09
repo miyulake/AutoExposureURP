@@ -14,9 +14,10 @@ void CSMain(uint3 id : SV_DispatchThreadID)
 
     if (id.x >= size.x || id.y >= size.y) return;
 
-    float3 c = SceneTexture[id.xy].rgb;
-    float lum = dot(c, float3(0.2126, 0.7152, 0.0722)); // Rec. 709 luminance
+    float3 c = SceneTexture.Load(int3(id.xy, 0)).rgb;
+    float lum = dot(c, float3(0.2126, 0.7152, 0.0722)); // Rec. 709 luminance formula
+    lum = clamp(lum, 0.01, 10.0);
 
     InterlockedAdd(LuminanceBuffer[0], (uint)(lum * 1000));
-    InterlockedAdd(LuminanceBuffer[1], 1000);
+    InterlockedAdd(LuminanceBuffer[1], (uint)1000);
 }

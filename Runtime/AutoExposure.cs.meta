@@ -4,7 +4,7 @@ MonoImporter:
   externalObjects: {}
   serializedVersion: 2
   defaultReferences:
-  - m_LuminanceCompute: {fileID: 7200000, guid: 20b08edf878ff6e458e53ad4cd2f6865, type: 3}
+  - m_LuminanceCompute: {fileID: 7200000, guid: 55c67919974e4854e9444ed201436287, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

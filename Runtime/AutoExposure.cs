@@ -118,18 +118,18 @@ public class AutoExposure : ScriptableRendererFeature
     }
 
     [Header("Setup")]
-    [SerializeField] private RenderPassEvent m_Event = RenderPassEvent.AfterRenderingSkybox;
+    [SerializeField] private RenderPassEvent m_Event = RenderPassEvent.AfterRenderingTransparents;
     [SerializeField] private ComputeShader m_LuminanceCompute;
 
     [Header("Settings")]
     [Tooltip("If the current average luminance is <color=yellow>higher</color> than the target, the scene will darken.")]
-    [SerializeField, Range(0.01f, 1)] private float m_TargetLuminance = 0.1f;
+    [SerializeField, Range(0.01f, 1)] private float m_TargetLuminance = 0.4f;
     [Tooltip("Maximum exposure compensation.\n(value of 1 corresponds to a maximum of -1 post-exposure)")]
-    [SerializeField, Range(0, 10)] private float m_MaxDarkeningEV = 1f;
+    [SerializeField, Range(0, 10)] private float m_MaxDarkeningEV = 4f;
     [Tooltip("How fast the scene darkens.")]
     [SerializeField, Min(0)] private float m_AdaptationSpeed = 3f;
     [Tooltip("Larger values are more accurate, but smaller values are faster.")]
-    [SerializeField, Range(16, 256)] private int m_DownsampleSize = 64;
+    [SerializeField, Range(16, 128)] private int m_DownsampleSize = 32;
 
     private LuminancePass m_Pass;
 
