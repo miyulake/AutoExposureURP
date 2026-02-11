@@ -1,16 +1,23 @@
-#if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-public static class URPValidator
+namespace Miyu.AutoExposure.Editor
 {
-    [InitializeOnLoadMethod]
-    static void Validate()
+    [InitializeOnLoad]
+    public static class URPValidator
     {
-        if (GraphicsSettings.currentRenderPipeline is not UniversalRenderPipelineAsset)
-            Debug.LogWarning("AutoExposure requires URP. Please enable URP in Project Settings.");
+        static URPValidator()
+        {
+            Validate();
+            RenderPipelineManager.activeRenderPipelineTypeChanged += Validate;
+        }
+
+        private static void Validate()
+        {
+            if (GraphicsSettings.currentRenderPipeline is not UniversalRenderPipelineAsset)
+                Debug.LogWarning("URP is not active. Auto Exposure requires URP.");
+        }
     }
 }
-#endif
