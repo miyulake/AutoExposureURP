@@ -5,6 +5,7 @@ MonoImporter:
   serializedVersion: 2
   defaultReferences:
   - m_LuminanceCompute: {fileID: 7200000, guid: 55c67919974e4854e9444ed201436287, type: 3}
+  - m_ExposureMaterial: {fileID: 2100000, guid: bf956bc9f35ab9d4b88ae62884edef9a, type: 2}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

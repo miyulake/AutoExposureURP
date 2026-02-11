@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
@@ -11,64 +11,92 @@ public class AutoExposure : ScriptableRendererFeature
         private ComputeBuffer m_Buffer;
         private readonly ComputeShader _Compute;
 
-        private readonly float _TargetLuminance;
-        private readonly float _MaxDarkeningEV;
-        private readonly float _AdaptationSpeed;
-        private readonly int _DownsampleSize;
-
         private readonly Dictionary<int, float> _CameraEV = new();
+        private readonly Dictionary<int, float> _SmoothedLuminance = new();
 
         static readonly int SceneTexture = Shader.PropertyToID("SceneTexture");
         static readonly int LuminanceBuffer = Shader.PropertyToID("LuminanceBuffer");
 
         public float AverageLuminance { get; private set; }
 
-        public LuminancePass(ComputeShader compute, float targetLuminance, float maxDarkeningEV, float adaptationSpeed, int downsampleSize)
-        {
-            _Compute = compute;
-            _TargetLuminance = targetLuminance;
-            _MaxDarkeningEV = maxDarkeningEV;
-            _AdaptationSpeed = adaptationSpeed;
-            _DownsampleSize = downsampleSize;
-        }
+        public LuminancePass(ComputeShader compute) => _Compute = compute;
 
         public void Setup() => m_Buffer ??= new ComputeBuffer(2, sizeof(uint));
 
-        void ApplyExposure(ref RenderingData data)
+        private void ApplyExposure(ref RenderingData data, AutoExposureSettings settings)
         {
             var stack = VolumeManager.instance.stack;
             var colorAdjustments = stack.GetComponent<ColorAdjustments>();
             if (colorAdjustments == null) return;
 
-            var luminance = AverageLuminance;
-            var deltaEV = Mathf.Log(luminance / _TargetLuminance, 2f);
-            deltaEV = Mathf.Max(0f, deltaEV);
-            deltaEV = Mathf.Clamp(deltaEV, 0f, _MaxDarkeningEV);
-
             var camID = data.cameraData.camera.GetInstanceID();
+
+            if (!_SmoothedLuminance.TryGetValue(camID, out var smoothedLum)) smoothedLum = AverageLuminance;
+
+            smoothedLum = 
+                Mathf.Lerp(smoothedLum, AverageLuminance, settings.adaptationSpeed.value * Time.deltaTime);
+
+            _SmoothedLuminance[camID] = smoothedLum;
+
+            smoothedLum = Mathf.Max(smoothedLum, 0.01f);
+
+            var deltaEV = 
+                Mathf.Log(Mathf.Max(smoothedLum, 0.0001f) / settings.targetLuminance.value, 2f);
+            deltaEV = Mathf.Max(0f, deltaEV);
+            deltaEV = Mathf.Clamp(deltaEV, 0f, settings.maxDarkeningEV.value);
+
             if (!_CameraEV.TryGetValue(camID, out float currentEV)) currentEV = 0f;
 
             var targetEV = -deltaEV;
-            currentEV = Mathf.Lerp(currentEV, targetEV, _AdaptationSpeed * Time.deltaTime);
+            currentEV = Mathf.Lerp(currentEV, targetEV, settings.adaptationSpeed.value * Time.deltaTime);
 
             _CameraEV[camID] = currentEV;
 
-            var baseExposure = colorAdjustments.postExposure.value;
-            colorAdjustments.postExposure.value = baseExposure + currentEV;
-
+            colorAdjustments.postExposure.value += currentEV;
         }
-
+        /*
+        private bool IsSettingsActive()
+        {
+            var volumes = VolumeManager.instance.GetVolumes(0);
+            foreach (var volume in volumes)
+            {
+                if (!volume.isActiveAndEnabled || volume.profile == null) continue;
+                if (volume.profile.TryGet<AutoExposureSettings>(out var settings))
+                {
+                    var settingsActive = settings != null && settings.active;
+                    return settingsActive;
+                }
+            }
+            return false;
+        }
+        */
         public override void Execute(ScriptableRenderContext context, ref RenderingData data)
         {
-            if (data.cameraData.cameraType != CameraType.Game || _Compute == null) return;
+            /*
+            // Get the active volume instead of the stack
+            var volume = FindObjectOfType<Volume>();
+            if (volume == null || !volume.isActiveAndEnabled || 
+                !volume.profile.TryGet<AutoExposureSettings>(out var settings)) return;
+            */
+
+            // Very bad hack that checks if the first parameter is overridden (fixes a lot of bugs for now)
+            var settings = VolumeManager.instance.stack.GetComponent<AutoExposureSettings>();
+            var firstParameter = settings.parameters[0];
+            if (data.cameraData.cameraType != CameraType.Game || _Compute == null || !firstParameter.overrideState/*!IsSettingsActive()*/) return;
+
+            if (settings.updateInterval.value > 1 && Time.frameCount % settings.updateInterval.value != 0)
+            {
+                ApplyExposure(ref data, settings);
+                return;
+            }
 
             Setup();
 
             var cmd = CommandBufferPool.Get("AutoExposure Luminance");
 
             var descriptor = data.cameraData.cameraTargetDescriptor;
-            descriptor.width = _DownsampleSize;
-            descriptor.height = _DownsampleSize;
+            descriptor.width = settings.downsampleSize.value;
+            descriptor.height = settings.downsampleSize.value;
             descriptor.depthBufferBits = 0;
 
             RenderingUtils.ReAllocateIfNeeded(
@@ -105,7 +133,7 @@ public class AutoExposure : ScriptableRendererFeature
             m_Buffer.GetData(result);
             AverageLuminance = Mathf.Max(result[0] / Mathf.Max(result[1], 1), 0.01f);
 
-            ApplyExposure(ref data);
+            ApplyExposure(ref data, settings);
         }
 
         public void Dispose()
@@ -114,28 +142,21 @@ public class AutoExposure : ScriptableRendererFeature
             m_Buffer = null;
             m_Downsampled?.Release();
             m_Downsampled = null;
+            _CameraEV.Clear();
+            _SmoothedLuminance.Clear();
         }
     }
 
     [Header("Setup")]
-    [SerializeField] private RenderPassEvent m_Event = RenderPassEvent.AfterRenderingTransparents;
+    [Tooltip("When the pass is executed.")]
+    [SerializeField] private RenderPassEvent m_Event = RenderPassEvent.AfterRenderingOpaques;
+    [Tooltip("The compute shader used by the pass.")]
     [SerializeField] private ComputeShader m_LuminanceCompute;
-
-    [Header("Settings")]
-    [Tooltip("If the current average luminance is <color=yellow>higher</color> than the target, the scene will darken.")]
-    [SerializeField, Range(0.01f, 1)] private float m_TargetLuminance = 0.4f;
-    [Tooltip("Maximum exposure compensation.\n(value of 1 corresponds to a maximum of -1 post-exposure)")]
-    [SerializeField, Range(0, 10)] private float m_MaxDarkeningEV = 4f;
-    [Tooltip("How fast the scene darkens.")]
-    [SerializeField, Min(0)] private float m_AdaptationSpeed = 3f;
-    [Tooltip("Larger values are more accurate, but smaller values are faster.")]
-    [SerializeField, Range(16, 128)] private int m_DownsampleSize = 32;
-
     private LuminancePass m_Pass;
 
     public override void Create()
     {
-        if (m_LuminanceCompute != null) m_Pass = new LuminancePass(m_LuminanceCompute, m_TargetLuminance, m_MaxDarkeningEV, m_AdaptationSpeed, m_DownsampleSize);
+        if (m_LuminanceCompute != null) m_Pass = new(m_LuminanceCompute);
     }
 
     public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData data)
