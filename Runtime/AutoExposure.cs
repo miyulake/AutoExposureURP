@@ -56,36 +56,11 @@ namespace Miyu.AutoExposure.Runtime
 
                 colorAdjustments.postExposure.value += currentEV;
             }
-            /*
-            private bool IsSettingsActive()
-            {
-                var volumes = VolumeManager.instance.GetVolumes(0);
-                foreach (var volume in volumes)
-                {
-                    if (!volume.isActiveAndEnabled || volume.profile == null) continue;
-                    if (volume.profile.TryGet<AutoExposureSettings>(out var settings))
-                    {
-                        var settingsActive = settings != null && settings.active;
-                        return settingsActive;
-                    }
-                }
-                return false;
-            }
-            */
+
             public override void Execute(ScriptableRenderContext context, ref RenderingData data)
             {
-                /*
-                // Get the active volume instead of the stack
-                var volume = FindObjectOfType<Volume>();
-                if (volume == null || !volume.isActiveAndEnabled || 
-                    !volume.profile.TryGet<AutoExposureSettings>(out var settings)) return;
-                */
-
-                // Very bad hack that checks if the first parameter is overridden (fixes a lot of bugs for now)
                 var settings = VolumeManager.instance.stack.GetComponent<AutoExposureSettings>();
-                var firstParameter = settings.parameters[0];
-                if (data.cameraData.cameraType != CameraType.Game || _Compute == null || !firstParameter.overrideState/*!IsSettingsActive()*/) return;
-
+                if (data.cameraData.cameraType != CameraType.Game || _Compute == null || !settings.IsActive()) return;
                 if (settings.updateInterval.value > 1 && Time.frameCount % settings.updateInterval.value != 0)
                 {
                     ApplyExposure(ref data, settings);
@@ -129,6 +104,7 @@ namespace Miyu.AutoExposure.Runtime
                 );
 
                 context.ExecuteCommandBuffer(cmd);
+                cmd.Clear();
                 CommandBufferPool.Release(cmd);
 
                 var result = new uint[2];
@@ -141,8 +117,8 @@ namespace Miyu.AutoExposure.Runtime
             public void Dispose()
             {
                 m_Buffer?.Release();
-                m_Buffer = null;
                 m_Downsampled?.Release();
+                m_Buffer = null;
                 m_Downsampled = null;
                 _CameraEV.Clear();
                 _SmoothedLuminance.Clear();

@@ -17,5 +17,19 @@ namespace Miyu.AutoExposure.Runtime
         public ClampedIntParameter updateInterval = new(1, 1, 10);
         [Tooltip("Larger values are more accurate, but smaller values are faster.")]
         public ClampedIntParameter downsampleSize = new(32, 16, 128);
+
+        // Doesn't work
+        //public bool IsActive() => active && adaptationSpeed.value > 0f;
+
+        // Temporary fix for a lot of bugs
+        public bool IsActive()
+        {
+            if (adaptationSpeed.value <= 0f) return false;
+
+            for (int i = 0; i < parameters.Count; i++)
+                if (parameters[i].overrideState) return true;
+
+            return false;
+        }
     }
 }
