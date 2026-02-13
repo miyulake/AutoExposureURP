@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.0.2] - 2026-02-13
+- Moved settings to volume component.
+
 ## [1.0.1] - 2026-02-09
 - Added center weighted luminance compute shader.
 
