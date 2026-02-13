@@ -12,5 +12,12 @@
     "dependencies": {
         "com.unity.render-pipelines.universal": "14.0.6"
     },
-    "hideInEditor": false
+    "hideInEditor": false,
+    "samples": [
+        {
+            "displayName": "Auto Exposure Test Scene",
+            "description": "Scene demonstrating auto exposure with controllable camera.",
+            "path": "Samples~"
+        }
+    ]
 }
