@@ -1,10 +1,22 @@
-using UnityEngine;
 using System.Collections;
+using UnityEngine;
 
 namespace Miyu.Tools
 {
     public class FreeCamera : MonoBehaviour
     {
+#if !ENABLE_LEGACY_INPUT_MANAGER
+        private void Start()
+        {
+            Debug.LogWarningFormat(
+                this,
+                "{0} requires the Legacy Input Manager and will not function.",
+                nameof(FreeCamera));
+            enabled = false;
+        }
+#endif
+
+#if ENABLE_LEGACY_INPUT_MANAGER
         [SerializeField] private float m_MoveSpeed = 10f;
         [SerializeField] private float m_LookSpeed = 2f;
         [SerializeField] private float m_SpeedMultiplier = 2f;
@@ -13,7 +25,7 @@ namespace Miyu.Tools
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.R)) Reset();
+            if (Input.GetKeyDown(KeyCode.R)) Reset(); 
 
             if (Input.GetKeyDown(KeyCode.P)) Time.timeScale = Time.timeScale == 1 ? 0 : 1;
 
@@ -60,5 +72,6 @@ namespace Miyu.Tools
             m_Pitch = 0f;
             transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
         }
+#endif
     }
 }
