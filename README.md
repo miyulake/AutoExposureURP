@@ -1,6 +1,6 @@
 # Simple URP Auto Exposure
 [![Website](https://img.shields.io/badge/Contact%20Website%20-8A2BE2)](https://miyu.gay)
-[![Itch](https://img.shields.io/badge/Web-Itch?logo=Itch.io&color=white)](https://miyulake.itch.io)
+[![Itch](https://img.shields.io/badge/Itch%20Profile-Itch?logo=Itch.io&color=gray)](https://miyulake.itch.io)
 
 Feel free to use or modify this package!
 
@@ -29,3 +29,4 @@ https://github.com/miyulake/AutoExposureURP.git
 ## Known Issues
 - If no parameters are overridden in the volume component, the effect will be completely disabled.
 - Currently no support for WebGL builds, as they can struggle with compute shaders (may work on WebGPU, but this has not been tested).
+
