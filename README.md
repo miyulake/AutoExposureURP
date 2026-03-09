@@ -28,3 +28,4 @@ https://github.com/miyulake/AutoExposureURP.git
 
 ## Known Issues
 - If no parameters are overridden in the volume component, the effect will be completely disabled.
+- Currently no support for WebGL builds, as they can struggle with compute shaders (may work on WebGPU, but this has not been tested).
